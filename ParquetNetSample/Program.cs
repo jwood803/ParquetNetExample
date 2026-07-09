@@ -24,7 +24,7 @@ await rowGroupWriter.WriteColumnAsync(new DataColumn((DataField)schema.Fields[0]
 await rowGroupWriter.WriteColumnAsync(new DataColumn((DataField)schema.Fields[1], newSen2Data));
 await rowGroupWriter.WriteColumnAsync(new DataColumn((DataField)schema.Fields[2], newScoreData));
 
-// Low-level API to read Parquet files
+//// Low-level API to read Parquet files
 using var stream = File.OpenRead("train.parquet");
 using var reader = await ParquetReader.CreateAsync(stream);
 
@@ -51,16 +51,19 @@ for (int i = 0; i < reader.RowGroupCount; i++)
             Sentence2 = sen2.Data.GetValue(j)?.ToString(),
             Score = similarity.Data.GetValue(j) is null
                 ? 0
-                : Convert.ToSingle(similarity.Data.GetValue(j))
+                : Convert.ToDouble(similarity.Data.GetValue(j))
         });
     }
 }
 
-// High-level API to read Parquet files
-var sentenceSimilaritiesHighLevel = await ParquetSerializer.DeserializeAsync<SentenceSimilarity>("train.parquet", new ParquetSerializerOptions { PropertyNameCaseInsensitive = true });
-
 // Save to CSV
-using var writerHighLevel = new StreamWriter("similarity.csv");
+using var writerHighLevel = new StreamWriter("train.csv");
 using var csv = new CsvWriter(writerHighLevel, System.Globalization.CultureInfo.InvariantCulture);
 
-csv.WriteRecords(sentenceSimilarities);
+//csv.WriteRecords(sentenceSimilarities);
+
+// High-level API to read Parquet files
+var sentenceSimilaritiesHighLevel = await ParquetSerializer.DeserializeAsync<SentenceSimilarity>(
+    "train.parquet", new ParquetSerializerOptions { PropertyNameCaseInsensitive = true });
+
+csv.WriteRecords(sentenceSimilaritiesHighLevel);
