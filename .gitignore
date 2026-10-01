@@ -427,3 +427,7 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Output files the sample writes when it runs
+ParquetNetSample/new_similarity*.parquet
+ParquetNetSample/similarity.csv
